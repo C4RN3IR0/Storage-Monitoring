@@ -1,1 +1,53 @@
 # Storage-Monitoring
+📂 Monitor de Armazenamento AutomáticoEste projeto consiste em uma automação para sistemas Windows que monitora o uso do disco rígido (C:). Caso o armazenamento atinja ou ultrapasse 80% de ocupação, o sistema exibe alertas persistentes para o usuário final, incentivando a abertura de chamados preventivos.
+
+🚀 Funcionalidades
+O script é "implacável" e foi configurado para disparar o alerta nos seguintes eventos:
+
+ºLogon: Assim que o usuário entra na máquina.
+
+Desbloqueio (Win+L): Sempre que a estação de trabalho é desbloqueada.
+
+Recorrência: A cada 1 hora, caso o limite de 80% continue excedido.
+
+Contexto de Usuário: O alerta aparece para usuários comuns (sem privilégios de administrador), mas a tarefa é protegida contra exclusão por usuários leigos.
+
+🛠️ Estrutura de Arquivos
+monitor_disco.ps1: O script principal em PowerShell que realiza a checagem lógica.
+
+instalar.bat: Script de instalação que cria as tarefas agendadas no Windows.
+
+📋 Pré-requisitos
+Sistema Operacional: Windows 10 ou 11.
+
+Permissão de Administrador apenas para a instalação inicial.
+
+📥 Instalação
+Crie uma pasta chamada C:\Scripts.
+
+Cole o arquivo monitor_disco.ps1 dentro desta pasta.
+
+Execute o arquivo instalar.bat como Administrador.
+
+Isso configurará os gatilhos no Agendador de Tarefas do Windows automaticamente.
+
+⚙️ Detalhes Técnicos
+Script PowerShell (monitor_disco.ps1)
+O script utiliza a classe Win32_LogicalDisk para obter dados precisos do volume C:. A interface de alerta é gerada via objeto COM WScript.Shell, garantindo que o pop-up apareça sobreposto a outras janelas.
+
+Agendamento de Tarefas
+Para garantir que o pop-up apareça para usuários não-administradores, as tarefas são criadas com o nível de privilégio LIMITED. Isso permite que o script interaja com a área de trabalho do usuário logado no momento.
+
+🗑️ Desinstalação
+Para remover completamente o monitoramento da máquina, execute os seguintes comandos no Prompt de Comando (Admin):
+
+Snippet de código
+schtasks /delete /tn "AlertaArmazenamento_Hora" /f
+schtasks /delete /tn "AlertaArmazenamento_Login" /f
+schtasks /delete /tn "AlertaArmazenamento_Desbloqueio" /f
+rmdir /s /q "C:\Scripts"
+
+📝 Notas de Segurança
+Bypass de Execução: O instalador configura a chamada do PowerShell com -ExecutionPolicy Bypass para evitar bloqueios por políticas de restrição de script locais.
+
+Visibilidade: O script roda com -WindowStyle Hidden, eliminando o "piscar" de janelas de terminal na frente do colaborador.
